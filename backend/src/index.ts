@@ -19,7 +19,7 @@ const blockedDomains = new Set(freeEmailDomains);
 const app = new Hono<{ Bindings: Env }>();
 
 app.use('/api/*', cors({
-  origin: ['http://localhost:4321', 'https://psigid.butthe.top'],
+  origin: ['http://localhost:4321', 'https://psigid.nothingbut.top'],
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowHeaders: ['Content-Type', 'Authorization'],
 }));
