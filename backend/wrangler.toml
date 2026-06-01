@@ -1,0 +1,14 @@
+name = "backend"
+compatibility_date = "2024-03-20"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "portfolio-db"
+database_id = "22a28046-1d51-420a-bbc7-523f6d64e098" # Paste your ID here
+migration_dir = "drizzle"
+
+
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "portfolio-assets"
+

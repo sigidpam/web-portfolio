@@ -1,0 +1,81 @@
+import { Hono } from 'hono';
+import { cors } from 'hono/cors';
+import { drizzle } from 'drizzle-orm/d1';
+import { experience, pdfDownloads } from './schema';
+import freeEmailDomains from 'free-email-domains';
+
+// 1. Update Env Bindings to include the R2 Bucket
+export type Env = {
+  DB: D1Database;
+  BUCKET: R2Bucket; 
+};
+
+const blockedDomains = new Set(freeEmailDomains);
+const app = new Hono<{ Bindings: Env }>();
+
+app.use('/api/*', cors({
+  origin: ['http://localhost:4321', 'https://psigid.butthe.top'],
+  allowMethods: ['GET', 'POST', 'OPTIONS'],
+}));
+
+// Experience Endpoint
+app.get('/api/experience', async (c) => {
+  try {
+    const db = drizzle(c.env.DB);
+    const result = await db.select().from(experience);
+    return c.json({ success: true, data: result });
+  } catch (error) {
+    return c.json({ success: false, message: 'Failed to fetch experience.' }, 500);
+  }
+});
+
+// ==========================================
+// SECURED GATED DOWNLOAD ROUTE
+// ==========================================
+app.post('/api/download-cv', async (c) => {
+  try {
+    const { name, email } = await c.req.json();
+
+    if (!name || !email || !email.includes('@')) {
+      return c.json({ success: false, message: 'Invalid input.' }, 400);
+    }
+
+    const domain = email.split('@')[1].toLowerCase();
+
+    // Enforce Corporate Email Gate
+    if (blockedDomains.has(domain)) {
+      return c.json({ 
+        success: false, 
+        message: 'Please use a corporate email address to download the CV.' 
+      }, 403);
+    }
+
+    // 1. Write metadata log to Cloudflare D1
+    const db = drizzle(c.env.DB);
+    await db.insert(pdfDownloads).values({ 
+      name, 
+      email, 
+      downloadedAt: new Date() 
+    });
+
+    // 2. Fetch the file securely from Cloudflare R2
+    const fileName = 'Sigid_Pamungkas_CV.pdf';
+    const object = await c.env.BUCKET.get(fileName);
+
+    if (!object) {
+      return c.json({ success: false, message: 'CV file not found in storage.' }, 404);
+    }
+
+    // 3. Set download headers and stream the file directly to the client
+    c.header('Content-Type', 'application/pdf');
+    c.header('Content-Disposition', `attachment; filename="${fileName}"`);
+    
+    return c.body(object.body);
+
+  } catch (error) {
+    console.error(error);
+    return c.json({ success: false, message: 'Server error processing download.' }, 500);
+  }
+});
+
+export default app;

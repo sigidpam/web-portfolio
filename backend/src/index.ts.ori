@@ -1,0 +1,15 @@
+import { Hono } from 'hono';
+
+const app = new Hono();
+
+// Route utama agar browser tidak menampilkan 404 Not Found
+app.get('/', (c) => {
+  return c.text('Hello! Portfolio Backend is running successfully.');
+});
+
+// Contoh route API untuk mengecek apakah Hono berjalan
+app.get('/api/health', (c) => {
+  return c.json({ status: 'ok', database: 'connected' });
+});
+
+export default app;
