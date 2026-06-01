@@ -1,0 +1,103 @@
+---
+// frontend/src/pages/admin/dashboard.astro
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Dashboard | Admin">
+  <main class="max-w-6xl mx-auto px-6 py-12 hidden" id="dashboard-content">
+    <div class="flex justify-between items-center mb-12">
+      <h1 class="text-3xl font-bold text-white">Platform Analytics</h1>
+      <button id="logout-btn" class="bg-red-500/10 text-red-500 border border-red-500/20 px-4 py-2 rounded-lg text-sm hover:bg-red-500/20 transition-colors">
+        End Session
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      
+      <div class="bg-[#151515] border border-zinc-800 rounded-2xl p-6">
+        <h2 class="text-xl font-semibold text-white mb-4">CV Downloads (Leads)</h2>
+        <div id="leads-container" class="space-y-3 text-sm">
+          <p class="text-zinc-500 animate-pulse">Fetching encrypted data...</p>
+        </div>
+      </div>
+
+      <div class="bg-[#151515] border border-zinc-800 rounded-2xl p-6">
+        <h2 class="text-xl font-semibold text-white mb-4">Client Inquiries</h2>
+        <div id="inquiries-container" class="space-y-3 text-sm">
+          <p class="text-zinc-500 animate-pulse">Fetching encrypted data...</p>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const token = localStorage.getItem('admin_token');
+      const dashboard = document.getElementById('dashboard-content');
+      
+      // 1. Boot instantly if no token
+      if (!token) {
+        window.location.href = '/admin';
+        return;
+      }
+
+      // 2. Fetch secure data
+      try {
+        const res = await fetch('https://backend.anisqurli-g.workers.dev/api/admin/data/dashboard', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (res.status === 401) {
+          // Token expired or invalid
+          localStorage.removeItem('admin_token');
+          window.location.href = '/admin';
+          return;
+        }
+
+        const json = await res.json();
+        
+        if (json.success) {
+          // Unhide dashboard
+          dashboard?.classList.remove('hidden');
+          
+          // Render Leads
+          const leadsContainer = document.getElementById('leads-container');
+          if (leadsContainer) {
+            leadsContainer.innerHTML = json.data.leads.length === 0 
+              ? '<p class="text-zinc-500">No leads captured yet.</p>'
+              : json.data.leads.map((lead: any) => `
+                <div class="bg-[#0a0a0a] p-3 rounded-lg border border-zinc-800">
+                  <div class="text-white font-medium">${lead.name}</div>
+                  <div class="text-zinc-400">${lead.email}</div>
+                  <div class="text-zinc-600 text-xs mt-1">${new Date(lead.downloadedAt).toLocaleString()}</div>
+                </div>
+              `).join('');
+          }
+
+          // Render Inquiries
+          const inquiriesContainer = document.getElementById('inquiries-container');
+          if (inquiriesContainer) {
+            inquiriesContainer.innerHTML = json.data.messages.length === 0 
+              ? '<p class="text-zinc-500">No messages yet.</p>'
+              : json.data.messages.map((msg: any) => `
+                <div class="bg-[#0a0a0a] p-3 rounded-lg border border-zinc-800">
+                  <div class="text-white font-medium">${msg.name} <span class="text-zinc-500 font-normal">(${msg.email})</span></div>
+                  <div class="text-zinc-300 mt-1">${msg.subject}</div>
+                  <div class="text-zinc-500 mt-2">${msg.message}</div>
+                </div>
+              `).join('');
+          }
+        }
+      } catch (err) {
+        console.error("Dashboard failed to load", err);
+      }
+    });
+
+    // Logout function
+    document.getElementById('logout-btn')?.addEventListener('click', () => {
+      localStorage.removeItem('admin_token');
+      window.location.href = '/admin';
+    });
+  </script>
+</Layout>

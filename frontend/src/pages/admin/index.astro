@@ -1,0 +1,80 @@
+---
+// frontend/src/pages/admin/index.astro
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Admin Login | Sigid Pamungkas">
+  <main class="min-h-screen flex items-center justify-center bg-[#0a0a0a] px-6">
+    <div class="w-full max-w-md bg-[#151515] border border-zinc-800 rounded-3xl p-8 shadow-2xl">
+      <div class="text-center mb-8">
+        <div class="w-12 h-12 bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-4 font-bold tracking-tighter">SP</div>
+        <h1 class="text-2xl font-bold text-white">Admin Control Plane</h1>
+        <p class="text-zinc-500 text-sm mt-1">Authorized personnel only.</p>
+      </div>
+
+      <form id="login-form" class="space-y-6">
+        <div>
+          <label class="block text-sm font-medium text-zinc-400 mb-2">Passphrase</label>
+          <input 
+            type="password" 
+            id="passphrase" 
+            class="w-full bg-[#0a0a0a] border border-zinc-800 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-zinc-500 transition-colors"
+            required
+          />
+        </div>
+
+        <div class="cf-turnstile" data-sitekey="0x4AAAAAADcwSNrj22gr5ha367rDBSHH0Lw" data-theme="dark"></div>
+
+        <button 
+          type="submit" 
+          class="w-full bg-white text-black font-semibold rounded-xl px-4 py-3 hover:bg-zinc-200 transition-colors"
+        >
+          Authenticate
+        </button>
+        <p id="error-msg" class="text-red-500 text-sm text-center hidden"></p>
+      </form>
+    </div>
+  </main>
+
+  <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
+  <script>
+    const form = document.getElementById('login-form');
+    const errorMsg = document.getElementById('error-msg');
+
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const passphrase = (document.getElementById('passphrase') as HTMLInputElement).value;
+      const turnstileResponse = (document.querySelector('[name="cf-turnstile-response"]') as HTMLInputElement)?.value;
+
+      if (!turnstileResponse) {
+        if(errorMsg) { errorMsg.textContent = "Please complete the CAPTCHA."; errorMsg.classList.remove('hidden'); }
+        return;
+      }
+
+      try {
+        // We use the environment variable URL you set up earlier
+        const res = await fetch('https://backend.anisqurli-g.workers.dev/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ passphrase, turnstileToken: turnstileResponse })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          // Store JWT securely in localStorage
+          localStorage.setItem('admin_token', data.token);
+          window.location.href = '/admin/dashboard';
+        } else {
+          if(errorMsg) { errorMsg.textContent = data.message; errorMsg.classList.remove('hidden'); }
+          // Reset Turnstile on failure
+          window.turnstile.reset();
+        }
+      } catch (err) {
+        if(errorMsg) { errorMsg.textContent = "Server connection failed."; errorMsg.classList.remove('hidden'); }
+      }
+    });
+  </script>
+</Layout>
