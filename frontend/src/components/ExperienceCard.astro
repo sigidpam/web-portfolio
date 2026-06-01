@@ -1,0 +1,22 @@
+---
+// Menerima data (props) yang dikirim dari index.astro
+const { company, title, period, location, description } = Astro.props;
+---
+
+<article class="bg-gray-800 border border-gray-700 p-6 rounded-xl shadow-lg hover:border-blue-500 transition-colors">
+  <div class="flex flex-col md:flex-row md:justify-between md:items-start mb-2">
+    <div>
+      <h2 class="text-2xl font-bold text-blue-400">{title}</h2>
+      <h3 class="text-xl text-gray-200 font-semibold">{company}</h3>
+    </div>
+    <div class="mt-2 md:mt-0 text-left md:text-right">
+      <span class="inline-block bg-blue-900 text-blue-200 text-sm px-3 py-1 rounded-full font-medium">
+        {period}
+      </span>
+      <p class="text-sm text-gray-400 mt-1">{location}</p>
+    </div>
+  </div>
+  <p class="text-gray-300 mt-4 leading-relaxed">
+    {description}
+  </p>
+</article>

@@ -1,0 +1,33 @@
+---
+// frontend/src/components/ExperienceCard.astro
+interface Props {
+  company: string;
+  role: string;
+  period: string;
+  description: string;
+  highlights: string[];
+}
+
+const { company, role, period, description, highlights } = Astro.props;
+
+<div class="bg-[#151515] border border-zinc-800/60 rounded-2xl p-8 hover:bg-[#1a1a1a] hover:border-zinc-700 transition-all duration-300 group flex flex-col h-full">
+  <div class="mb-6">
+    <h3 class="text-xl font-semibold text-zinc-100 mb-1">{company}</h3>
+    <div class="flex justify-between items-center text-sm">
+      <span class="text-zinc-300 font-medium">{role}</span>
+      <span class="text-zinc-500 text-xs tracking-wider">{period}</span>
+    </div>
+  </div>
+  
+  <p class="text-zinc-400 text-sm leading-relaxed mb-8 flex-grow">
+    {description}
+  </p>
+  
+  <div class="space-y-3 mt-auto">
+    {highlights.map((highlight) => (
+      <div class="bg-[#1a1a1a] border border-zinc-800 rounded-lg px-4 py-2.5 text-xs text-zinc-300 font-medium group-hover:border-zinc-700 transition-colors">
+        {highlight}
+      </div>
+    ))}
+  </div>
+</div>
