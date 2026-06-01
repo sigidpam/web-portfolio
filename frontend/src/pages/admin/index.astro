@@ -39,6 +39,12 @@ import Layout from '../../layouts/Layout.astro';
   <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
   <script>
+    // 1. INSTANT REDIRECT: If a token already exists, bounce to dashboard
+    if (localStorage.getItem('admin_token')) {
+      window.location.replace('/admin/dashboard');
+    }
+
+    // 2. Standard Login Logic
     const form = document.getElementById('login-form');
     const errorMsg = document.getElementById('error-msg');
 
@@ -54,7 +60,6 @@ import Layout from '../../layouts/Layout.astro';
       }
 
       try {
-        // We use the environment variable URL you set up earlier
         const res = await fetch('https://backend.anisqurli-g.workers.dev/api/admin/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -64,12 +69,10 @@ import Layout from '../../layouts/Layout.astro';
         const data = await res.json();
 
         if (data.success) {
-          // Store JWT securely in localStorage
           localStorage.setItem('admin_token', data.token);
           window.location.href = '/admin/dashboard';
         } else {
           if(errorMsg) { errorMsg.textContent = data.message; errorMsg.classList.remove('hidden'); }
-          // Reset Turnstile on failure
           window.turnstile.reset();
         }
       } catch (err) {
