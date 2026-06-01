@@ -1,8 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
 
-import Layout from '../layouts/Layout.astro';
-
 // Fetch recent public repositories from your GitHub at build time
 let githubProjects = [];
 try {
@@ -13,11 +11,10 @@ try {
 } catch (e) {
   console.error("Failed to fetch GitHub projects during build.");
 }
-
 ---
 
 <Layout title="Sigid Pamungkas | Senior Cloud Engineer">
-  <main class="max-w-6xl mx-auto px-6 py-12">
+  <main class="max-w-6xl mx-auto px-6 py-12 relative">
     
     <section class="mb-32 mt-10">
       <p class="text-zinc-400 mb-4 font-medium tracking-wide">I am Sigid Pamungkas</p>
@@ -27,6 +24,11 @@ try {
       <p class="text-zinc-400 text-lg leading-relaxed mb-10 max-w-2xl">
         Performance-driven Senior Cloud Engineer with over 7 years of experience designing and managing scalable cloud architecture across fintech, telecom, and e-commerce sectors.
       </p>
+
+      <button id="open-cv-modal" class="bg-white text-black hover:bg-zinc-200 px-7 py-3.5 rounded-full text-sm font-bold transition-all duration-300 shadow-lg flex items-center gap-2">
+        <span>Download CV</span>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+      </button>
     </section>
 
     <section>
@@ -36,7 +38,6 @@ try {
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        
         <div class="bg-[#151515] border border-zinc-800/60 rounded-2xl p-8 hover:bg-[#1a1a1a] hover:border-zinc-700 transition-all duration-300">
           <h3 class="text-xl font-semibold text-zinc-100 mb-1">Bank Mandiri</h3>
           <div class="flex justify-between items-center text-sm mb-6">
@@ -58,14 +59,11 @@ try {
             Managed Google Cloud Platform environment, supporting over 100 VMs and 500+ microservices while reducing deployment times by 30%.
           </p>
         </div>
-
       </div>
     </section>
     
-    
     <section class="mt-32">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
-        
         <div>
           <h2 class="text-3xl font-bold text-white mb-8">Technical Arsenal</h2>
           <div class="flex flex-wrap gap-3">
@@ -80,7 +78,6 @@ try {
         <div>
           <h2 class="text-3xl font-bold text-white mb-8">Certifications</h2>
           <div class="space-y-4">
-            
             <div class="flex items-center p-5 bg-[#151515] border border-zinc-800/60 rounded-2xl hover:bg-[#1a1a1a] transition-colors">
               <div class="w-12 h-12 bg-zinc-800/50 rounded-full flex items-center justify-center mr-5">
                 <span class="text-xl">🏆</span>
@@ -110,14 +107,12 @@ try {
                 <p class="text-zinc-500 text-sm">Coursera · 2025</p>
               </div>
             </div>
-
           </div>
         </div>
-
       </div>
     </section>
     
-   <section class="mt-32 mb-20">
+    <section class="mt-32 mb-20">
       <div class="mb-12 flex justify-between items-end">
         <div>
           <h2 class="text-3xl font-bold text-white mb-2">Featured Architecture</h2>
@@ -129,7 +124,6 @@ try {
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        
         <div class="bg-gradient-to-br from-[#151515] to-[#0f0f0f] border border-zinc-800 rounded-2xl p-8 hover:border-zinc-600 transition-all duration-300">
           <div class="text-xs font-mono text-zinc-500 mb-4">Enterprise Infrastructure</div>
           <h3 class="text-2xl font-bold text-white mb-3">2nd Cloud Platform Development</h3>
@@ -179,9 +173,104 @@ try {
             </div>
           </a>
         ))}
-
       </div>
     </section>
 
+    <div id="cv-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm px-4">
+      <div class="bg-[#151515] border border-zinc-800 rounded-3xl p-8 max-w-md w-full shadow-2xl relative">
+        <button id="close-cv-modal" class="absolute top-6 right-6 text-zinc-500 hover:text-white transition-colors">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+        
+        <h3 class="text-2xl font-bold text-white mb-2">Request Full Resume</h3>
+        <p class="text-zinc-400 text-sm mb-6">Please provide your work email to download the complete PDF.</p>
+        
+        <form id="cv-form" class="space-y-4">
+          <div>
+            <input type="text" id="dl-name" placeholder="Full Name" required class="w-full bg-[#0a0a0a] border border-zinc-800 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-zinc-500 transition-colors" />
+          </div>
+          <div>
+            <input type="email" id="dl-email" placeholder="Corporate Email Address" required class="w-full bg-[#0a0a0a] border border-zinc-800 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-zinc-500 transition-colors" />
+          </div>
+          <button type="submit" id="dl-submit" class="w-full bg-white text-black font-semibold rounded-xl px-4 py-3 hover:bg-zinc-200 transition-colors flex justify-center items-center gap-2">
+            <span>Secure Download</span>
+          </button>
+          <p id="dl-error" class="text-red-500 text-xs text-center hidden"></p>
+        </form>
+      </div>
+    </div>
+
   </main>
 </Layout>
+
+<script>
+  const modal = document.getElementById('cv-modal');
+  const openBtn = document.getElementById('open-cv-modal');
+  const closeBtn = document.getElementById('close-cv-modal');
+  const form = document.getElementById('cv-form');
+  const errorMsg = document.getElementById('dl-error');
+  const submitBtn = document.getElementById('dl-submit');
+
+  openBtn?.addEventListener('click', () => {
+    modal?.classList.remove('hidden');
+    modal?.classList.add('flex');
+  });
+
+  closeBtn?.addEventListener('click', () => {
+    modal?.classList.add('hidden');
+    modal?.classList.remove('flex');
+  });
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const name = (document.getElementById('dl-name') as HTMLInputElement).value;
+    const email = (document.getElementById('dl-email') as HTMLInputElement).value;
+    
+    if (submitBtn) {
+      submitBtn.innerHTML = '<span class="animate-pulse">Processing...</span>';
+      (submitBtn as HTMLButtonElement).disabled = true;
+    }
+    if (errorMsg) errorMsg.classList.add('hidden');
+
+    try {
+      const res = await fetch('https://backend.anisqurli-g.workers.dev/api/download-cv', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email })
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.message || 'Failed to authorize download.');
+      }
+
+      // Convert the secure stream into a downloadable file in the browser
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'Sigid_Pamungkas_CV.pdf';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      a.remove();
+      
+      // Close modal on success
+      modal?.classList.add('hidden');
+      modal?.classList.remove('flex');
+      (form as HTMLFormElement).reset();
+
+    } catch (err: any) {
+      if (errorMsg) {
+        errorMsg.textContent = err.message;
+        errorMsg.classList.remove('hidden');
+      }
+    } finally {
+      if (submitBtn) {
+        submitBtn.innerHTML = '<span>Secure Download</span>';
+        (submitBtn as HTMLButtonElement).disabled = false;
+      }
+    }
+  });
+</script>
