@@ -1,124 +1,94 @@
-// backend/src/index.ts
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { drizzle } from 'drizzle-orm/d1';
 import { sign, verify } from 'hono/jwt';
-import { experience, pdfDownloads, inquiries, visitors } from './schema';
-import freeEmailDomains from 'free-email-domains';
+import { pdfDownloads, inquiries } from './schema';
 import { desc } from 'drizzle-orm';
 
-export type Env = {
+// Environment Bindings
+type Env = {
   DB: D1Database;
-  BUCKET: R2Bucket;
-  TURNSTILE_SECRET: string;
   JWT_SECRET: string;
-  ADMIN_PASSPHRASE: string;
+  TURNSTILE_SECRET: string;
 };
 
-const blockedDomains = new Set(freeEmailDomains);
 const app = new Hono<{ Bindings: Env }>();
 
+// CORS Setup
 app.use('/api/*', cors({
-  origin: ['http://localhost:4321', 'https://psigid.nothingbut.top'],
-  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowHeaders: ['Content-Type', 'Authorization'],
+  origin: ['https://psigid.nothingbut.top'],
+  allowMethods: ['GET', 'POST', 'OPTIONS'],
+  allowHeaders: ['Content-Type', 'Authorization', 'Content-Type'],
 }));
 
-// ==========================================
-// 1. PUBLIC ROUTES (Analytics & Display)
-// ==========================================
-
-// Track visitors (called silently by the frontend on load)
-app.post('/api/track', async (c) => {
-  try {
-    const { path } = await c.req.json();
-    const userAgent = c.req.header('User-Agent') || 'Unknown';
-    const db = drizzle(c.env.DB);
-    await db.insert(visitors).values({ path, userAgent, visitedAt: new Date() });
-    return c.json({ success: true });
-  } catch (e) {
-    return c.json({ success: false }, 500); // Fail silently for user
-  }
-});
-
-// Fetch Experience for public homepage
-app.get('/api/experience', async (c) => {
-  const db = drizzle(c.env.DB);
-  const result = await db.select().from(experience);
-  return c.json({ success: true, data: result });
-});
-
-// ==========================================
-// 2. AUTHENTICATION (Turnstile Captcha + JWT)
-// ==========================================
+// --- AUTHENTICATION ENDPOINTS ---
 
 app.post('/api/admin/login', async (c) => {
   const { passphrase, turnstileToken } = await c.req.json();
 
-  // 1. Verify Turnstile Captcha with Cloudflare
-  const formData = new FormData();
-  formData.append('secret', c.env.TURNSTILE_SECRET);
-  formData.append('response', turnstileToken);
+  // 1. Prepare Turnstile Verification
+  const params = new URLSearchParams();
+  params.append('secret', c.env.TURNSTILE_SECRET);
+  params.append('response', turnstileToken);
+  params.append('remoteip', c.req.header('CF-Connecting-IP') || '');
 
-  const turnstileCheck = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+  // 2. Perform Verification
+  const verifyRes = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
     method: 'POST',
-    body: formData,
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: params.toString(),
   });
-  const turnstileOutcome = await turnstileCheck.json() as any;
 
-  if (!turnstileOutcome.success) {
-    return c.json({ success: false, message: 'Captcha verification failed. Are you a bot?' }, 403);
+  const outcome = await verifyRes.json() as any;
+
+  if (!outcome.success) {
+    console.error("Turnstile Debug:", outcome); // Check your Worker logs!
+    return c.json({ 
+      success: false, 
+      message: 'Captcha failed', 
+      debug: outcome['error-codes'] 
+    }, 403);
   }
 
-  // 2. Verify Admin Passphrase
-  if (passphrase !== c.env.ADMIN_PASSPHRASE) {
-    return c.json({ success: false, message: 'Invalid credentials.' }, 401);
+  // 3. Password Check
+  if (passphrase !== "your_actual_password_here") {
+    return c.json({ success: false, message: 'Invalid credentials' }, 401);
   }
 
-  // 3. Issue JWT Token (Valid for 12 hours)
-  const token = await sign(
-    { role: 'admin', exp: Math.floor(Date.now() / 1000) + 60 * 60 * 12 },
-    c.env.JWT_SECRET
-  );
-
-  return c.json({ success: true, token });
+  // 4. Issue Token
+  const jwt = await sign({ role: 'admin' }, c.env.JWT_SECRET);
+  return c.json({ success: true, token: jwt });
 });
 
-// ==========================================
-// 3. SECURE ADMIN ROUTES (Protected by Middleware)
-// ==========================================
+// --- SECURE MIDDLEWARE ---
 
 app.use('/api/admin/data/*', async (c, next) => {
-  // ALLOW CORS PREFLIGHT TO PASS THROUGH
-  if (c.req.method === 'OPTIONS') {
-    return await next();
-  }
-
-  const authHeader = c.req.header('Authorization');
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return c.json({ success: false, message: 'Unauthorized' }, 401);
-  }
+  if (c.req.method === 'OPTIONS') return await next();
   
-  const token = authHeader.split(' ')[1];
+  const authHeader = c.req.header('Authorization');
+  if (!authHeader) return c.json({ success: false, message: 'Missing token' }, 401);
+
   try {
-    await verify(token, c.env.JWT_SECRET);
-    await next(); 
+    const jwt = authHeader.replace('Bearer ', '');
+    await verify(jwt, c.env.JWT_SECRET);
+    await next();
   } catch (e) {
-    return c.json({ success: false, message: 'Invalid or expired token' }, 401);
+    return c.json({ success: false, message: 'Invalid token' }, 401);
   }
 });
 
-// Get Dashboard Aggregates (Visitors, Downloads, Inquiries)
+// --- DATA ROUTES ---
+
 app.get('/api/admin/data/dashboard', async (c) => {
   const db = drizzle(c.env.DB);
-  
   const leads = await db.select().from(pdfDownloads).orderBy(desc(pdfDownloads.downloadedAt));
   const messages = await db.select().from(inquiries).orderBy(desc(inquiries.createdAt));
-  const stats = await db.select().from(visitors).orderBy(desc(visitors.visitedAt)).limit(50);
-
+  
   return c.json({ 
     success: true, 
-    data: { leads, messages, stats } 
+    data: { leads, messages } 
   });
 });
 
