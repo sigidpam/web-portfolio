@@ -36,29 +36,55 @@ import Layout from '../../layouts/Layout.astro';
       const token = localStorage.getItem('admin_token');
       const dashboard = document.getElementById('dashboard-content');
       
-      // 1. Boot instantly if no token
+      // Debug visualizer stops the endless bounce loop
+      const showError = (msg: string) => {
+        if(dashboard) {
+          dashboard.classList.remove('hidden');
+          dashboard.innerHTML = `
+            <div class="bg-red-500/10 border border-red-500 text-red-500 p-6 rounded-xl">
+              <h2 class="text-xl font-bold mb-2">Authentication Failed</h2>
+              <p class="mb-4">${msg}</p>
+              <button id="reset-auth" class="bg-red-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-600 transition-colors">
+                Clear Token & Return to Login
+              </button>
+            </div>`;
+          
+          document.getElementById('reset-auth')?.addEventListener('click', () => {
+            localStorage.removeItem('admin_token');
+            window.location.href = '/admin';
+          });
+        }
+      };
+
       if (!token) {
         window.location.href = '/admin';
         return;
       }
 
-      // 2. Fetch secure data
       try {
         const res = await fetch('https://backend.anisqurli-g.workers.dev/api/admin/data/dashboard', {
-          headers: { 'Authorization': `Bearer ${token}` }
+          method: 'GET',
+          headers: { 
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
         });
 
+        // IF REJECTED, SHOW ERROR INSTEAD OF REDIRECTING
         if (res.status === 401) {
-          // Token expired or invalid
-          localStorage.removeItem('admin_token');
-          window.location.href = '/admin';
+          const errData = await res.json().catch(() => ({}));
+          showError(`Backend rejected the token. Message: "${errData.message || 'Unknown'}". <br/><br/>If this persists, your JWT_SECRET might not be matching between sign and verify.`);
+          return; 
+        }
+
+        if (!res.ok) {
+          showError(`Backend crashed with status: ${res.status}. This usually means your D1 Database tables (visitors, inquiries, pdf_downloads) were not applied to the remote edge.`);
           return;
         }
 
         const json = await res.json();
         
         if (json.success) {
-          // Unhide dashboard
           dashboard?.classList.remove('hidden');
           
           // Render Leads
@@ -90,11 +116,10 @@ import Layout from '../../layouts/Layout.astro';
           }
         }
       } catch (err) {
-        console.error("Dashboard failed to load", err);
+        showError(`Network failure. Could not connect to the backend. Error: ${err}`);
       }
     });
 
-    // Logout function
     document.getElementById('logout-btn')?.addEventListener('click', () => {
       localStorage.removeItem('admin_token');
       window.location.href = '/admin';
