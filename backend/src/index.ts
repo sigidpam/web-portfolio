@@ -88,8 +88,12 @@ app.post('/api/admin/login', async (c) => {
 // 3. SECURE ADMIN ROUTES (Protected by Middleware)
 // ==========================================
 
-// Middleware to verify JWT on all routes starting with /api/admin/data/
 app.use('/api/admin/data/*', async (c, next) => {
+  // ALLOW CORS PREFLIGHT TO PASS THROUGH
+  if (c.req.method === 'OPTIONS') {
+    return await next();
+  }
+
   const authHeader = c.req.header('Authorization');
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return c.json({ success: false, message: 'Unauthorized' }, 401);
@@ -98,7 +102,7 @@ app.use('/api/admin/data/*', async (c, next) => {
   const token = authHeader.split(' ')[1];
   try {
     await verify(token, c.env.JWT_SECRET);
-    await next(); // Token is valid, proceed to route
+    await next(); 
   } catch (e) {
     return c.json({ success: false, message: 'Invalid or expired token' }, 401);
   }
