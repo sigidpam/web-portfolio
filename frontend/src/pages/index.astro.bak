@@ -1,54 +1,184 @@
 ---
-// frontend/src/pages/index.astro
 import Layout from '../layouts/Layout.astro';
-import ExperienceCard from '../components/ExperienceCard.astro';
+
+import Layout from '../layouts/Layout.astro';
+
+// Fetch recent public repositories from your GitHub at build time
+let githubProjects = [];
+try {
+  const res = await fetch('https://api.github.com/users/sigidpam/repos?sort=updated&per_page=4');
+  if (res.ok) {
+    githubProjects = await res.json();
+  }
+} catch (e) {
+  console.error("Failed to fetch GitHub projects during build.");
+}
+
 ---
 
 <Layout title="Sigid Pamungkas | Senior Cloud Engineer">
-  <main class="max-w-6xl mx-auto px-6 py-10">
+  <main class="max-w-6xl mx-auto px-6 py-12">
     
-    <!-- ... (Keep your existing Nav and Hero section here) ... -->
+    <section class="mb-32 mt-10">
+      <p class="text-zinc-400 mb-4 font-medium tracking-wide">I am Sigid Pamungkas</p>
+      <h1 class="text-5xl md:text-7xl font-bold leading-tight mb-6 tracking-tight text-white">
+        Senior Cloud <br/> Engineer
+      </h1>
+      <p class="text-zinc-400 text-lg leading-relaxed mb-10 max-w-2xl">
+        Performance-driven Senior Cloud Engineer with over 7 years of experience designing and managing scalable cloud architecture across fintech, telecom, and e-commerce sectors.
+      </p>
+    </section>
 
-    <!-- Work Experience Section -->
-    <section class="mt-32">
-      <div class="text-center mb-16">
-        <h2 class="text-3xl font-bold text-white mb-3 tracking-tight">Work Experience</h2>
-        <p class="text-zinc-400 text-sm font-medium tracking-wide uppercase">Managing Scalable Cloud Environments</p>
+    <section>
+      <div class="mb-12">
+        <h2 class="text-3xl font-bold text-white mb-2">Work Experience</h2>
+        <p class="text-zinc-500 text-sm tracking-wide uppercase">Managing Scalable Cloud Environments</p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         
-        <ExperienceCard 
-          company="Bank Mandiri"
-          role="Senior Cloud Engineer"
-          period="Sep 2021 — Present"
-          description="Oversee the availability and performance of cloud environments hosting over 3,000 virtual machines, microservices, and containers."
-          highlights={["VMware & OpenShift", "Hybrid Cloud Architecture"]}
-        />
+        <div class="bg-[#151515] border border-zinc-800/60 rounded-2xl p-8 hover:bg-[#1a1a1a] hover:border-zinc-700 transition-all duration-300">
+          <h3 class="text-xl font-semibold text-zinc-100 mb-1">Bank Mandiri</h3>
+          <div class="flex justify-between items-center text-sm mb-6">
+            <span class="text-zinc-300 font-medium">Senior Cloud Engineer</span>
+            <span class="text-zinc-500 text-xs">Sep 2021 — Present</span>
+          </div>
+          <p class="text-zinc-400 text-sm leading-relaxed">
+            Oversee the availability and performance of cloud environments hosting over 3,000 virtual machines, microservices, and containers.
+          </p>
+        </div>
 
-        <ExperienceCard 
-          company="CTCorp Digital"
-          role="Senior DevOps Engineer"
-          period="Nov 2020 — Aug 2021"
-          description="Managed Google Cloud Platform environment, supporting over 100 VMs and 500+ microservices while reducing deployment times by 30%."
-          highlights={["GCP Management", "CI/CD Pipeline Automation"]}
-        />
+        <div class="bg-[#151515] border border-zinc-800/60 rounded-2xl p-8 hover:bg-[#1a1a1a] hover:border-zinc-700 transition-all duration-300">
+          <h3 class="text-xl font-semibold text-zinc-100 mb-1">CTCorp Digital</h3>
+          <div class="flex justify-between items-center text-sm mb-6">
+            <span class="text-zinc-300 font-medium">Senior DevOps Engineer</span>
+            <span class="text-zinc-500 text-xs">Nov 2020 — Aug 2021</span>
+          </div>
+          <p class="text-zinc-400 text-sm leading-relaxed">
+            Managed Google Cloud Platform environment, supporting over 100 VMs and 500+ microservices while reducing deployment times by 30%.
+          </p>
+        </div>
 
-        <ExperienceCard 
-          company="Stellar Kapital"
-          role="Senior System Administrator"
-          period="Sep 2018 — Oct 2020"
-          description="Managed cloud environments on Digital Ocean and AWS, incorporating automated testing to streamline CI/CD release workflows."
-          highlights={["AWS & Digital Ocean", "Node.js & Flutter Automation"]}
-        />
+      </div>
+    </section>
+    
+    
+    <section class="mt-32">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+        
+        <div>
+          <h2 class="text-3xl font-bold text-white mb-8">Technical Arsenal</h2>
+          <div class="flex flex-wrap gap-3">
+            {['AWS', 'Google Cloud', 'Kubernetes', 'Docker', 'VMware', 'OpenShift', 'CI/CD (Jenkins, GitLab)', 'GitOps (ArgoCD, Tekton)', 'Ansible', 'Linux/RHEL', 'TypeScript', 'Node.js'].map((skill) => (
+              <span class="bg-[#151515] border border-zinc-800 text-zinc-300 px-5 py-2.5 rounded-full text-sm font-medium hover:border-zinc-600 hover:text-white transition-colors cursor-default">
+                {skill}
+              </span>
+            ))}
+          </div>
+        </div>
 
-        <ExperienceCard 
-          company="VTS IT Group"
-          role="L2 System Engineer"
-          period="Sep 2017 — Sep 2018"
-          description="Managed and administered over 1,000 virtual machines across VMware and Azure Cloud environments for 50+ enterprise clients."
-          highlights={["Azure Cloud", "Data Backup & Recovery"]}
-        />
+        <div>
+          <h2 class="text-3xl font-bold text-white mb-8">Certifications</h2>
+          <div class="space-y-4">
+            
+            <div class="flex items-center p-5 bg-[#151515] border border-zinc-800/60 rounded-2xl hover:bg-[#1a1a1a] transition-colors">
+              <div class="w-12 h-12 bg-zinc-800/50 rounded-full flex items-center justify-center mr-5">
+                <span class="text-xl">🏆</span>
+              </div>
+              <div>
+                <h3 class="text-white font-semibold">AWS Solution Architect Associate</h3>
+                <p class="text-zinc-500 text-sm">Amazon Web Services · 2024</p>
+              </div>
+            </div>
+
+            <div class="flex items-center p-5 bg-[#151515] border border-zinc-800/60 rounded-2xl hover:bg-[#1a1a1a] transition-colors">
+              <div class="w-12 h-12 bg-zinc-800/50 rounded-full flex items-center justify-center mr-5">
+                <span class="text-xl">☸️</span>
+              </div>
+              <div>
+                <h3 class="text-white font-semibold">Kubernetes and Cloud Native Associate</h3>
+                <p class="text-zinc-500 text-sm">Linux Foundation · 2023</p>
+              </div>
+            </div>
+
+            <div class="flex items-center p-5 bg-[#151515] border border-zinc-800/60 rounded-2xl hover:bg-[#1a1a1a] transition-colors">
+              <div class="w-12 h-12 bg-zinc-800/50 rounded-full flex items-center justify-center mr-5">
+                <span class="text-xl">🧠</span>
+              </div>
+              <div>
+                <h3 class="text-white font-semibold">Machine Learning, AI & Cybersecurity</h3>
+                <p class="text-zinc-500 text-sm">Coursera · 2025</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+    
+   <section class="mt-32 mb-20">
+      <div class="mb-12 flex justify-between items-end">
+        <div>
+          <h2 class="text-3xl font-bold text-white mb-2">Featured Architecture</h2>
+          <p class="text-zinc-500 text-sm tracking-wide uppercase">Enterprise Solutions & Open Source</p>
+        </div>
+        <a href="https://github.com/sigidpam" target="_blank" class="text-zinc-400 hover:text-white text-sm font-medium transition-colors hidden md:block">
+          View all on GitHub →
+        </a>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <div class="bg-gradient-to-br from-[#151515] to-[#0f0f0f] border border-zinc-800 rounded-2xl p-8 hover:border-zinc-600 transition-all duration-300">
+          <div class="text-xs font-mono text-zinc-500 mb-4">Enterprise Infrastructure</div>
+          <h3 class="text-2xl font-bold text-white mb-3">2nd Cloud Platform Development</h3>
+          <p class="text-zinc-400 text-sm leading-relaxed mb-6">
+            Built private cloud platform using Morpheus CMP integrated with AWS. Reduced average server installation time from 1 day to just 15 minutes with automated BMC Remedy workflows.
+          </p>
+          <div class="flex gap-2">
+            <span class="text-xs bg-zinc-900 border border-zinc-800 text-zinc-300 px-3 py-1 rounded-full">Morpheus</span>
+            <span class="text-xs bg-zinc-900 border border-zinc-800 text-zinc-300 px-3 py-1 rounded-full">Hyper-V</span>
+            <span class="text-xs bg-zinc-900 border border-zinc-800 text-zinc-300 px-3 py-1 rounded-full">Shell</span>
+          </div>
+        </div>
+
+        <div class="bg-gradient-to-br from-[#151515] to-[#0f0f0f] border border-zinc-800 rounded-2xl p-8 hover:border-zinc-600 transition-all duration-300">
+          <div class="text-xs font-mono text-zinc-500 mb-4">CI/CD Pipeline</div>
+          <h3 class="text-2xl font-bold text-white mb-3">GitOps for Mobile Apps</h3>
+          <p class="text-zinc-400 text-sm leading-relaxed mb-6">
+            Engineered an end-to-end GitOps pipeline utilizing Tekton, ArgoCD, and Sonarqube to automate vulnerability testing, stress testing, and version releasing.
+          </p>
+          <div class="flex gap-2 flex-wrap">
+            <span class="text-xs bg-zinc-900 border border-zinc-800 text-zinc-300 px-3 py-1 rounded-full">Tekton</span>
+            <span class="text-xs bg-zinc-900 border border-zinc-800 text-zinc-300 px-3 py-1 rounded-full">ArgoCD</span>
+            <span class="text-xs bg-zinc-900 border border-zinc-800 text-zinc-300 px-3 py-1 rounded-full">Kubernetes</span>
+          </div>
+        </div>
+
+        {githubProjects.length > 0 && githubProjects.map((repo: any) => (
+          <a href={repo.html_url} target="_blank" class="bg-[#0a0a0a] border border-zinc-800/60 rounded-2xl p-8 hover:bg-[#121212] hover:border-zinc-700 transition-all duration-300 group flex flex-col">
+            <div class="flex justify-between items-start mb-4">
+              <div class="text-xs font-mono text-zinc-500">GitHub Repository</div>
+              <svg class="w-5 h-5 text-zinc-600 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+            </div>
+            <h3 class="text-xl font-bold text-zinc-200 mb-2 group-hover:text-white transition-colors">{repo.name}</h3>
+            <p class="text-zinc-500 text-sm leading-relaxed mb-6 flex-grow">
+              {repo.description || 'No description provided for this repository.'}
+            </p>
+            <div class="flex items-center gap-4 text-xs font-medium text-zinc-500">
+              {repo.language && (
+                <span class="flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                  {repo.language}
+                </span>
+              )}
+              <span class="flex items-center gap-1.5">
+                <span>⭐</span> {repo.stargazers_count}
+              </span>
+            </div>
+          </a>
+        ))}
 
       </div>
     </section>
