@@ -1,54 +1,49 @@
 ---
-// frontend/src/pages/index.astro
 import Layout from '../layouts/Layout.astro';
-import ExperienceCard from '../components/ExperienceCard.astro';
 ---
 
 <Layout title="Sigid Pamungkas | Senior Cloud Engineer">
-  <main class="max-w-6xl mx-auto px-6 py-10">
+  <main class="max-w-6xl mx-auto px-6 py-12">
     
-    <!-- ... (Keep your existing Nav and Hero section here) ... -->
+    <section class="mb-32 mt-10">
+      <p class="text-zinc-400 mb-4 font-medium tracking-wide">I am Sigid Pamungkas</p>
+      <h1 class="text-5xl md:text-7xl font-bold leading-tight mb-6 tracking-tight text-white">
+        Senior Cloud <br/> Engineer
+      </h1>
+      <p class="text-zinc-400 text-lg leading-relaxed mb-10 max-w-2xl">
+        Performance-driven Senior Cloud Engineer with over 7 years of experience designing and managing scalable cloud architecture across fintech, telecom, and e-commerce sectors.
+      </p>
+    </section>
 
-    <!-- Work Experience Section -->
-    <section class="mt-32">
-      <div class="text-center mb-16">
-        <h2 class="text-3xl font-bold text-white mb-3 tracking-tight">Work Experience</h2>
-        <p class="text-zinc-400 text-sm font-medium tracking-wide uppercase">Managing Scalable Cloud Environments</p>
+    <section>
+      <div class="mb-12">
+        <h2 class="text-3xl font-bold text-white mb-2">Work Experience</h2>
+        <p class="text-zinc-500 text-sm tracking-wide uppercase">Managing Scalable Cloud Environments</p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         
-        <ExperienceCard 
-          company="Bank Mandiri"
-          role="Senior Cloud Engineer"
-          period="Sep 2021 — Present"
-          description="Oversee the availability and performance of cloud environments hosting over 3,000 virtual machines, microservices, and containers."
-          highlights={["VMware & OpenShift", "Hybrid Cloud Architecture"]}
-        />
+        <div class="bg-[#151515] border border-zinc-800/60 rounded-2xl p-8 hover:bg-[#1a1a1a] hover:border-zinc-700 transition-all duration-300">
+          <h3 class="text-xl font-semibold text-zinc-100 mb-1">Bank Mandiri</h3>
+          <div class="flex justify-between items-center text-sm mb-6">
+            <span class="text-zinc-300 font-medium">Senior Cloud Engineer</span>
+            <span class="text-zinc-500 text-xs">Sep 2021 — Present</span>
+          </div>
+          <p class="text-zinc-400 text-sm leading-relaxed">
+            Oversee the availability and performance of cloud environments hosting over 3,000 virtual machines, microservices, and containers.
+          </p>
+        </div>
 
-        <ExperienceCard 
-          company="CTCorp Digital"
-          role="Senior DevOps Engineer"
-          period="Nov 2020 — Aug 2021"
-          description="Managed Google Cloud Platform environment, supporting over 100 VMs and 500+ microservices while reducing deployment times by 30%."
-          highlights={["GCP Management", "CI/CD Pipeline Automation"]}
-        />
-
-        <ExperienceCard 
-          company="Stellar Kapital"
-          role="Senior System Administrator"
-          period="Sep 2018 — Oct 2020"
-          description="Managed cloud environments on Digital Ocean and AWS, incorporating automated testing to streamline CI/CD release workflows."
-          highlights={["AWS & Digital Ocean", "Node.js & Flutter Automation"]}
-        />
-
-        <ExperienceCard 
-          company="VTS IT Group"
-          role="L2 System Engineer"
-          period="Sep 2017 — Sep 2018"
-          description="Managed and administered over 1,000 virtual machines across VMware and Azure Cloud environments for 50+ enterprise clients."
-          highlights={["Azure Cloud", "Data Backup & Recovery"]}
-        />
+        <div class="bg-[#151515] border border-zinc-800/60 rounded-2xl p-8 hover:bg-[#1a1a1a] hover:border-zinc-700 transition-all duration-300">
+          <h3 class="text-xl font-semibold text-zinc-100 mb-1">CTCorp Digital</h3>
+          <div class="flex justify-between items-center text-sm mb-6">
+            <span class="text-zinc-300 font-medium">Senior DevOps Engineer</span>
+            <span class="text-zinc-500 text-xs">Nov 2020 — Aug 2021</span>
+          </div>
+          <p class="text-zinc-400 text-sm leading-relaxed">
+            Managed Google Cloud Platform environment, supporting over 100 VMs and 500+ microservices while reducing deployment times by 30%.
+          </p>
+        </div>
 
       </div>
     </section>

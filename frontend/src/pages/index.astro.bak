@@ -1,35 +1,57 @@
 ---
-// Import komponen wajib ada di sini agar tidak error "not defined"
+// frontend/src/pages/index.astro
+import Layout from '../layouts/Layout.astro';
 import ExperienceCard from '../components/ExperienceCard.astro';
-
-// Mengambil data langsung dari backend D1 Cloudflare kamu
-const response = await fetch('https://backend.anisqurli-g.workers.dev/api/experience');
-const result = await response.json();
-const experiences = result.data || [];
 ---
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width" />
-    <title>Portfolio - Pengalaman Kerja</title>
-  </head>
-  <body class="bg-gray-900 text-white min-h-screen p-8 font-sans">
-    <main class="max-w-3xl mx-auto">
-      <h1 class="text-4xl font-bold mb-8 border-b border-gray-700 pb-4">Pengalaman Kerja</h1>
-      
-      <div class="space-y-6">
-        {experiences.map((exp: any) => (
-          <ExperienceCard 
-            company={exp.company}
-            title={exp.title}
-            period={exp.period}
-            location={exp.location}
-            description={exp.description}
-          />
-        ))}
+<Layout title="Sigid Pamungkas | Senior Cloud Engineer">
+  <main class="max-w-6xl mx-auto px-6 py-10">
+    
+    <!-- ... (Keep your existing Nav and Hero section here) ... -->
+
+    <!-- Work Experience Section -->
+    <section class="mt-32">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl font-bold text-white mb-3 tracking-tight">Work Experience</h2>
+        <p class="text-zinc-400 text-sm font-medium tracking-wide uppercase">Managing Scalable Cloud Environments</p>
       </div>
-    </main>
-  </body>
-</html>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        
+        <ExperienceCard 
+          company="Bank Mandiri"
+          role="Senior Cloud Engineer"
+          period="Sep 2021 — Present"
+          description="Oversee the availability and performance of cloud environments hosting over 3,000 virtual machines, microservices, and containers."
+          highlights={["VMware & OpenShift", "Hybrid Cloud Architecture"]}
+        />
+
+        <ExperienceCard 
+          company="CTCorp Digital"
+          role="Senior DevOps Engineer"
+          period="Nov 2020 — Aug 2021"
+          description="Managed Google Cloud Platform environment, supporting over 100 VMs and 500+ microservices while reducing deployment times by 30%."
+          highlights={["GCP Management", "CI/CD Pipeline Automation"]}
+        />
+
+        <ExperienceCard 
+          company="Stellar Kapital"
+          role="Senior System Administrator"
+          period="Sep 2018 — Oct 2020"
+          description="Managed cloud environments on Digital Ocean and AWS, incorporating automated testing to streamline CI/CD release workflows."
+          highlights={["AWS & Digital Ocean", "Node.js & Flutter Automation"]}
+        />
+
+        <ExperienceCard 
+          company="VTS IT Group"
+          role="L2 System Engineer"
+          period="Sep 2017 — Sep 2018"
+          description="Managed and administered over 1,000 virtual machines across VMware and Azure Cloud environments for 50+ enterprise clients."
+          highlights={["Azure Cloud", "Data Backup & Recovery"]}
+        />
+
+      </div>
+    </section>
+
+  </main>
+</Layout>

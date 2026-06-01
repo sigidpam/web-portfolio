@@ -1,6 +1,5 @@
 ---
-// frontend/src/layouts/Layout.astro
-import '../styles/global.css'; // Add this line!
+import '../styles/global.css';
 
 interface Props {
   title: string;
@@ -13,13 +12,13 @@ const { title } = Astro.props;
 <html lang="en" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
-    <meta name="description" content="Sigid Pamungkas - Senior Cloud Engineer Portfolio" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content="Sigid Pamungkas - Senior Cloud Engineer" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
   </head>
-  <body class="bg-[#0a0a0a] text-zinc-100 font-sans antialiased selection:bg-zinc-700 selection:text-white">
+  <body class="bg-[#0a0a0a] text-zinc-100 font-sans antialiased selection:bg-zinc-700 selection:text-white min-h-screen">
     <slot />
   </body>
 </html>
